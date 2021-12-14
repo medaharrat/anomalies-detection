@@ -24,5 +24,5 @@ if __name__ == "__main__":
             payload = json.dumps(row)
             # Produce
             producer.send(TOPIC, value=payload.encode('utf-8'))
-            # Wait a number of second until next message
+            #Wait a number of second until next message
             time.sleep(waitSeconds - ((time.time() - startTime) % waitSeconds))
