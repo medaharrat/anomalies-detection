@@ -1,0 +1,117 @@
+version: '3.5'
+
+services:
+  # Kafka Service Running with Zookeeper
+  kafka:
+    image: spotify/kafka
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - 9092:9092
+    environment:
+      ADVERTISED_HOST: kafka
+      ADVERTISED_PORT: 9092
+      AUTO_CREATE_TOPICS: "true"
+    command: >
+        bash -c
+        "(sleep 15s &&
+        /opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh
+        --create
+        --zookeeper
+        localhost:2181 --replication-factor 1 --partitions 1 --topic SWAT &) && (supervisord -n)"
+    healthcheck:
+      test: ['CMD-SHELL', '/opt/kafka_2.11-0.10.1.0/bin/kafka-topics.sh --zookeeper localhost:2181 --list']
+      interval: 20s
+      timeout: 5s
+      retries: 3
+    networks:
+      - swat-network
+          
+  # Jupyter Environment with PySpark
+  spark:
+    image: jupyter/pyspark-notebook
+    container_name: pyspark
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work/notebooks/
+    networks:
+      - swat-network
+      
+  # Influx DB Server
+  #influxdb:
+  #  image: docker.io/bitnami/influxdb:2
+  #  container_name: influxdb
+  #  ports:
+  #    - 8086:8086
+  #    - 8088:8088
+  #  environment:
+  #    - INFLUXDB_ADMIN_USER=admin
+  #    - INFLUXDB_ADMIN_USER_PASSWORD=admin123
+  #    - INFLUXDB_ADMIN_USER_TOKEN=oYv0r_QOhJDale5T84giAY092htxXL3_3DTMfDDyaKzszBk9c7iQRosKhHc5MBWlKwjO2oNmffFdackpGFy4MA==
+  #    - INFLUXDB_HTTP_AUTH_ENABLED=true
+  #    - INFLUXDB_USER_BUCKET=primary
+  #    - INFLUXDB_HTTP_READINESS_TIMEOUT=30
+  #  volumes:
+  #    - influxdb:/bitnami/influxdb
+  #  networks:
+  #    - swat-network
+
+  # User Interface for Influx DB
+  chronograf:
+    image: chronograf:latest
+    hostname: chronograf
+    container_name: chronograf
+    ports:
+      - 8888:8888
+    volumes:
+      - ./srv/docker/chronograf/data:/var/lib/chronograf
+    networks:
+      - swat-network
+
+  # Plugin-driven Server Agent for collecting and sending metrics and events
+  telegraf:
+    image: telegraf:latest
+    hostname: telegraf
+    container_name: telegraf
+    environment:
+      HOSTNAME: "telegraf-getting-started"
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks:
+      - swat-network
+
+  # Framework for data visualization
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-server
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./srv/docker/grafana/data:/var/lib/grafana
+    networks:
+      - swat-network
+
+  # Python Environement running a KafkaProducer program
+  producer:      
+    image: producer
+    container_name: producer
+    build: ./kafka-producer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - swat-network
+
+networks:
+  swat-network:
+    name: swat-network
+    external: false
+    
+volumes:
+  influxdb:
