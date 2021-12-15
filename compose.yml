@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3'
 
 services:
   # Kafka Service Running with Zookeeper
@@ -32,32 +32,45 @@ services:
     image: jupyter/pyspark-notebook
     container_name: pyspark
     ports:
-      - "8888:8888"
+      - 8888:8888
     volumes:
       - ./spark:/home/jovyan/work/notebooks/
     networks:
       - swat-network
-      
-  # Influx DB Server
-  #influxdb:
-  #  image: docker.io/bitnami/influxdb:2
-  #  container_name: influxdb
-  #  ports:
-  #    - 8086:8086
-  #    - 8088:8088
-  #  environment:
-  #    - INFLUXDB_ADMIN_USER=admin
-  #    - INFLUXDB_ADMIN_USER_PASSWORD=admin123
-  #    - INFLUXDB_ADMIN_USER_TOKEN=oYv0r_QOhJDale5T84giAY092htxXL3_3DTMfDDyaKzszBk9c7iQRosKhHc5MBWlKwjO2oNmffFdackpGFy4MA==
-  #    - INFLUXDB_HTTP_AUTH_ENABLED=true
-  #    - INFLUXDB_USER_BUCKET=primary
-  #    - INFLUXDB_HTTP_READINESS_TIMEOUT=30
-  #  volumes:
-  #    - influxdb:/bitnami/influxdb
-  #  networks:
-  #    - swat-network
 
-  # User Interface for Influx DB
+  # Framework for data visualization
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana:/var/lib/grafana
+    #depends_on: 
+    #  - influxdb
+    networks:
+      - swat-network
+
+  # Influx DB Server
+  influxdb:
+    image: influxdb:1.7
+    container_name: influxdb
+    restart: always
+    ports:
+     - 8086:8086
+    volumes:
+      - influxdb:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=swat
+      - INFLUXDB_USER=mohamed
+      - INFLUXDB_USER_PASSWORD=admin123
+      - INFLUXDB_ADMIN_ENABLED=true
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin123
+    networks:
+      - swat-network
+
+  # User Interface for Influx DB - RUNNING BUT PROBLME WITH PORT
   chronograf:
     image: chronograf:latest
     hostname: chronograf
@@ -65,35 +78,7 @@ services:
     ports:
       - 8888:8888
     volumes:
-      - ./srv/docker/chronograf/data:/var/lib/chronograf
-    networks:
-      - swat-network
-
-  # Plugin-driven Server Agent for collecting and sending metrics and events
-  telegraf:
-    image: telegraf:latest
-    hostname: telegraf
-    container_name: telegraf
-    environment:
-      HOSTNAME: "telegraf-getting-started"
-    volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    networks:
-      - swat-network
-
-  # Framework for data visualization
-  grafana:
-    image: grafana/grafana
-    container_name: grafana-server
-    restart: always
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_INSTALL_PLUGINS=
-    ports:
-      - '3000:3000'
-    volumes:
-      - ./srv/docker/grafana/data:/var/lib/grafana
+      - chronograf:/var/lib/chronograf
     networks:
       - swat-network
 
@@ -110,8 +95,8 @@ services:
 
 networks:
   swat-network:
-    name: swat-network
-    external: false
     
 volumes:
+  grafana:
   influxdb:
+  chronograf:
