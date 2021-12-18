@@ -46,8 +46,8 @@ services:
       - 3000:3000
     volumes:
       - grafana:/var/lib/grafana
-    #depends_on: 
-    #  - influxdb
+    depends_on: 
+      - influxdb
     networks:
       - swat-network
 
@@ -72,16 +72,16 @@ services:
       - swat-network
 
   # User Interface for Influx DB - RUNNING BUT PROBLME WITH PORT
-  chronograf:
-    image: chronograf:latest
-    hostname: chronograf
-    container_name: chronograf
-    ports:
-      - 8888:8888
-    volumes:
-      - chronograf:/var/lib/chronograf
-    networks:
-      - swat-network
+  #chronograf:
+  #  image: chronograf:latest
+  #  hostname: chronograf
+  #  container_name: chronograf
+  #  ports:
+  #    - 8888:8888
+  #  volumes:
+  #    - chronograf:/var/lib/chronograf
+  #  networks:
+  #    - swat-network
 
   # Python Environement running a KafkaProducer program
   producer:      
@@ -100,4 +100,3 @@ networks:
 volumes:
   grafana:
   influxdb:
-  chronograf:
