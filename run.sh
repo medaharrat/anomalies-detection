@@ -1,6 +1,6 @@
 # Create influxdb volume
-mkdir influxdb
+mkdir -p influxdb
 # Create grafana volume
-mkdir grafana
+mkdir -p grafana
 # Run docker compose
 docker-compose up

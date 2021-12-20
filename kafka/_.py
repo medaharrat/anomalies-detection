@@ -16,7 +16,7 @@ if __name__ == "__main__":
     producer = KafkaProducer(bootstrap_servers = BOOTSTRAP_SERVER)
     # Time interval
     startTime = time.time()
-    waitSeconds = .5
+    waitSeconds = .1
 
     while True:
         for row in data:

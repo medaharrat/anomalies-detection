@@ -63,8 +63,6 @@ services:
     environment:
       - INFLUXDB_DB=swat
       - INFLUXDB_USER_BUCKET=swat
-      - INFLUXDB_USER=mohamed
-      - INFLUXDB_USER_PASSWORD=admin123
       - INFLUXDB_ADMIN_USER=admin
       - INFLUXDB_ADMIN_USER_PASSWORD=admin123
       - INFLUXDB_ADMIN_USER_TOKEN=iJHZR-dq4I5LIpFZCc5bTUHx-I7dyz29ZTO-B4W5DpU4mhPVDFg-aAb2jK4Vz1C6n0DDb6ddA-bJ3EZAanAOUw==
