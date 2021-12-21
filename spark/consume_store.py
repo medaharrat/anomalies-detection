@@ -7,6 +7,7 @@ from influx_writer import InfluxDBWriter
 from influxdb_client import InfluxDBClient
 
 import os
+import sys
 import json
 import numpy as np
 import pandas as pd
@@ -57,7 +58,7 @@ if __name__=="__main__":
     query = (inputStream
             .writeStream
             .outputMode("append")
-            .foreach(InfluxDBWriter())
+            .foreach(InfluxDBWriter( sys.argv[1] ))
             .start())
 
     query.awaitTermination()

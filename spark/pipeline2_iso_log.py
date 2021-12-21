@@ -1,36 +1,38 @@
 # Isolation Forest and Logistic Regression
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import pickle
 from sklearn.ensemble import IsolationForest
 from sklearn.linear_model import LogisticRegression
-#%matplotlib inline
-
-def isolotion_tree(data):
-    iso=IsolationForest(contamination='auto',random_state=42)
-    isol=iso.fit_predict(data)
-    return isol
+from sklearn.metrics import accuracy_score
 
 # Load the data
-data = pd.read_csv('./data/SWaT_train.csv', delimiter=',')
+data = pd.read_csv('./SWaT_train.csv', delimiter=',')
 
-# Fit Isolation Forest
-labels = isolotion_tree(data)
+# Unsupervised Isolation Forest
+iso = IsolationForest(contamination = 'auto', random_state = 42)
+isol = iso.fit_predict( data.iloc[:, data.columns != 'Time'] )
+
+# Split the dataset
+data = data.iloc[:, data.columns != 'Time'] 
+i = round(len(data)*.8)
+## 80% of the data
+X_train = np.asarray(data[0:i])
+y_train = np.asarray(isol[0:i])
+## 20% of the data
+X_valid = np.asarray(data[i+1:len(data)])
+y_valid = np.asarray(isol[i+1:len(isol)])
+## Print shapes
+print(X_train.shape, y_train.shape, X_valid.shape, y_valid.shape)
 
 # Logistic Regression
-model = LogisticRegression(max_iter=2000)
-model.fit(dfc.drop(["Labels"], axis=1), dfc["Labels"])
+model = LogisticRegression(max_iter = 2000)
+model.fit(X_train, y_train)
+## Predict on validation set
+preds = model.predict(X_valid)
+## Accuracy
+accuracy = accuracy_score(y_valid, preds)
 
-y_pred=[]   
-for x in range(len(sup_data)):
-  y_pred.append(model.predict([sup_data.iloc[x]]))
-
-outlier_pos = np.where(y_pred == -1)[0]
-x = []; y = [];
-for pos in outlier_pos:
-    x.append(np.array(sup_data['FIT101'])[pos])
-    y.append(sup_data['FIT101'].index[pos])
-
-plt.plot(sup_data["FIT101"].loc[sup_data['FIT101'].index])
-plt.plot(y,x,'r*', markersize=5)
-
+# Save model
+with open('./models/iso_log.pickle', 'wb') as f:
+    pickle.dump(model, f)

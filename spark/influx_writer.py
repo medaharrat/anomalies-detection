@@ -12,7 +12,7 @@ import pandas as pd
 from datetime import datetime
 
 class InfluxDBWriter:
-    def __init__(self, cloud=False):
+    def __init__(self, approach='ocsvm', cloud=False):
         self.url = "http://influxdb:8086"
         self.token = "iJHZR-dq4I5LIpFZCc5bTUHx-I7dyz29ZTO-B4W5DpU4mhPVDFg-aAb2jK4Vz1C6n0DDb6ddA-bJ3EZAanAOUw=="
         self.org = "primary"
@@ -97,8 +97,18 @@ class InfluxDBWriter:
         return point
     
     def _is_anomaly(self, row):
-        # Polynomial SVC on Isolation Trees model
-        svc = pickle.load(open('./models/ocsvm.pickle', 'rb'))
+        model = ""
+        # Import the model
+        if self.approach == 'ocsvm':
+            model = "ocsvm.pickle"
+        elif self.approach == 'iso_log':
+            model = "iso_log.pickle"
+        elif self.approach == 'kmeans':
+            model = "kmeans.pickle"
+        else:
+            model = "dbscan.pickle"
+
+        model = pickle.load(open(f'./models/{model}', 'rb'))
         # Detect anomalies
-        preds = svc.predict(self._preprocess(row))
+        preds = model.predict(self._preprocess(row))
         return preds
