@@ -28,13 +28,12 @@ services:
       - swat-network
           
   # Jupyter Environment with PySpark
-  spark:
-    image: jupyter/pyspark-notebook
+  pyspark:
+    image: pyspark
+    build: ./spark
     container_name: pyspark
     ports:
       - 8888:8888
-    volumes:
-      - ./spark:/home/jovyan/work/notebooks/
     networks:
       - swat-network
 
