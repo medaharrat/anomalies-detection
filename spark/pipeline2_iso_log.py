@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
 # Load the data
-data = pd.read_csv('./SWaT_train.csv', delimiter=',')
+data = pd.read_csv('./data/SWaT_train.csv', delimiter=',')
 
 # Unsupervised Isolation Forest
 iso = IsolationForest(contamination = 'auto', random_state = 42)
@@ -22,8 +22,6 @@ y_train = np.asarray(isol[0:i])
 ## 20% of the data
 X_valid = np.asarray(data[i+1:len(data)])
 y_valid = np.asarray(isol[i+1:len(isol)])
-## Print shapes
-print(X_train.shape, y_train.shape, X_valid.shape, y_valid.shape)
 
 # Logistic Regression
 model = LogisticRegression(max_iter = 2000)

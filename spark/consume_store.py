@@ -58,7 +58,7 @@ if __name__=="__main__":
     query = (inputStream
             .writeStream
             .outputMode("append")
-            .foreach(InfluxDBWriter( sys.argv[1] ))
+            .foreach(InfluxDBWriter( approach = sys.argv[1] ))
             .start())
 
     query.awaitTermination()

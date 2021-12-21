@@ -19,4 +19,4 @@ echo '[>] Creating chronograf directory'
 mkdir -p chronograf
 
 echo '[>] Running docker compose'
-docker-compose up  --remove-orphans
+docker-compose up --remove-orphans --build

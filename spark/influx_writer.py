@@ -17,6 +17,7 @@ class InfluxDBWriter:
         self.token = "iJHZR-dq4I5LIpFZCc5bTUHx-I7dyz29ZTO-B4W5DpU4mhPVDFg-aAb2jK4Vz1C6n0DDb6ddA-bJ3EZAanAOUw=="
         self.org = "primary"
         self.bucket = "swat"
+        self.approach = approach
         if cloud: # Connect to InfluxDB Cloud
             self.client = InfluxDBClient(
                 url="https://westeurope-1.azure.cloud2.influxdata.com", 
