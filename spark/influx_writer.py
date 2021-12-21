@@ -27,10 +27,6 @@ class InfluxDBWriter:
             self.client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
         # Create a writer API
         self.write_api = self.client.write_api()
-
-    def open(self, partition_id, epoch_id):
-        print("Opened %d, %d" % (partition_id, epoch_id))
-        return True
     
     def _preprocess(self, row):
         # Row to Dict
@@ -74,7 +70,6 @@ class InfluxDBWriter:
     def process(self, row):
         try:
             self.write_api.write(bucket=self.bucket, org=self.org, record=self._row_to_point(row["data"]))
-            print(f"> Inserted into '{self.bucket}' bucket")
         except Exception as ex:
             print(f"[x] Error {str(ex)}")
 
