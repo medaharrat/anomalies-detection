@@ -8,7 +8,7 @@ The project streams data from an xlsx file through Kafka to a topic called SWAT.
 This topic is then subscribed by the PySpark instance in another container.
 Each batch is pre-processed and stored in InfluxDB as a data point together with anomalies.
 Data is visualized in Grafana in 4 different boards representing anomalies detected using four different approaches.
-In addition to that, a monitoring board is put in place using Telegraf to collect metrics.
+In addition to that, a monitoring board is put in place using Telegraf to collect metrics and visualize in Chronograf.
 ![architecture](https://github.com/medaharrat/anomalies-detection/blob/main/docs/OST_SM.png)
 
 Each part of the project is containerized using Docker, in addition to two built images

@@ -15,5 +15,8 @@ mkdir -p influxdb
 echo '[>] Creating grafana directory'
 mkdir -p grafana
 
+echo '[>] Creating chronograf directory'
+mkdir -p chronograf
+
 echo '[>] Running docker compose'
 docker-compose up  --remove-orphans

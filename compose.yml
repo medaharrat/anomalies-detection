@@ -77,7 +77,7 @@ services:
     container_name: telegraf
     restart: always
     volumes:
-    - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     environment:
       - HOST=${INFLUXDB_HOST}
       - TOKEN=${AUTH_TOKEN}
@@ -89,6 +89,24 @@ services:
       - influxdb
     ports:
       - 8125:8125
+    networks:
+      - swat-network
+
+  # Chronograf is a visualization tool for time series data in InfluxDB
+  chronograf:
+    image: chronograf:latest
+    hostname: chronograf
+    container_name: chronograf
+    ports:
+      - 8080:8080
+    links:
+      - influxdb
+    depends_on:
+      - influxdb
+    volumes:
+      - chronograf:/var/lib/chronograf
+    environment:
+      - PORT=8080
     networks:
       - swat-network
 
@@ -109,3 +127,4 @@ networks:
 volumes:
   grafana:
   influxdb:
+  chronograf:
