@@ -12,17 +12,17 @@ import pandas as pd
 from datetime import datetime
 
 class InfluxDBWriter:
-    def __init__(self, approach='ocsvm', cloud=False):
+    def __init__(self, approaches, cloud=False):
         self.url = "http://influxdb:8086"
         self.token = "iJHZR-dq4I5LIpFZCc5bTUHx-I7dyz29ZTO-B4W5DpU4mhPVDFg-aAb2jK4Vz1C6n0DDb6ddA-bJ3EZAanAOUw=="
         self.org = "primary"
         self.bucket = "swat"
-        self.approach = approach
+        self.approaches = approaches
         if cloud: # Connect to InfluxDB Cloud
             self.client = InfluxDBClient(
-                url="https://westeurope-1.azure.cloud2.influxdata.com", 
-                token="iJHZR-dq4I5LIgFZCc5jTUNx-I7dyz29ZTO-B4W5DpU4mhPVDFg-aAb2jK4Vz1C6n0DDb6ddA-bJ3EZAanAOUw==", 
-                org="ahr9oi@inf.elte.hu"
+                url="<cloud.url>", 
+                token="<cloud.token>", 
+                org="<cloud.org>"
             )
         else: # Connect to a local instance of InfluxDB
             self.client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
@@ -77,37 +77,62 @@ class InfluxDBWriter:
     def _row_to_point(self, row):
         # Load to dictionary
         row_dict = json.loads(row)
-        # String to timestamp
-        # timestamp = datetime.datetime.strptime(row_dict["Time"], "%d/%m/%Y %H:%M:%S.%f %p")
-        # Create a data point
-        point = Point("data")
-        # Add fields to the point
-        row_list = []
-        for key, val in row_dict.items():
-            if key != 'Time':
-                point.field(key, float(val))
-                row_list.append(float(val))
-        # Predict
         anomaly = 0.0
-        if self._is_anomaly(row)[0] == -1:
-            anomaly = np.max(row_list)
-        # print(anomaly)
-        point.field('anomaly', anomaly)
-        # Add timestamp
-        point.time(datetime.now())
+        points = []
+        # String to timestamp
+        timestamp = datetime.strptime(row_dict["Time"], "%d/%m/%Y %H:%M:%S.%f %p")
+        # Handle multiple approaches
+        if len(self.approaches) > 1:
+            for approach in self.approaches:
+                # Create a data point to the approach measurement
+                point = Point(approach)
+                # Add fields to the point
+                row_list = []
+                for key, val in row_dict.items():
+                    if key != 'Time':
+                        point.field(key, float(val))
+                        row_list.append(float(val))
+                # Predict
+                if self._is_anomaly(row, approach)[0] == -1:
+                    anomaly = np.max(row_list)
+                point.field('anomaly', anomaly)
+                # Add timestamp
+                point.time(timestamp)
+                # Append to a list
+                points.append(point)
+            return points
+        else:
+            approach = self.approaches[0]
+            # Create a data point
+            point = Point(approach)
+            # Add fields to the point
+            row_list = []
+            for key, val in row_dict.items():
+                if key != 'Time':
+                    point.field(key, float(val))
+                    row_list.append(float(val))
+            # Predict
+            if self._is_anomaly(row, approach)[0] == -1:
+                anomaly = np.max(row_list)
+            # print(anomaly)
+            point.field('anomaly', anomaly)
+            # Add timestamp
+            point.time(timestamp)
         return point
     
-    def _is_anomaly(self, row):
+    def _is_anomaly(self, row, approach):
         model = ""
         # Import the model
-        if self.approach == 'ocsvm':
+        if approach == 'ocsvm':
             model = "ocsvm.pickle"
-        elif self.approach == 'iso_log':
+        elif approach == 'iso_log':
             model = "iso_log.pickle"
-        elif self.approach == 'kmeans':
+        elif approach == 'kmeans':
             model = "kmeans.pickle"
-        else:
+        elif approach == 'dbscan':
             model = "dbscan.pickle"
+        else:
+            print(f"[x] {approach} doesn't exist!")
 
         model = pickle.load(open(f'./models/{model}', 'rb'))
         # Detect anomalies

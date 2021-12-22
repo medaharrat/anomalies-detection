@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 echo '[>] Exporting variables'
 export INFLUXDB_DB=swat
 export INFLUXDB_HOST=http://influxdb:8086

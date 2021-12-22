@@ -55,10 +55,19 @@ if __name__=="__main__":
 
     # Read stream and process
     print(f"> Reading the stream and storing ...")
-    query = (inputStream
+    if len(sys.argv) > 2:
+        query = (inputStream
             .writeStream
             .outputMode("append")
-            .foreach(InfluxDBWriter( approach = sys.argv[1] ))
+            .foreach(InfluxDBWriter( approaches = sys.argv[1:] ))
+            .option("checkpointLocation", "checkpoints")
             .start())
+    else:
+        query = (inputStream
+                .writeStream
+                .outputMode("append")
+                .foreach(InfluxDBWriter( approaches = sys.argv[1] ))
+                .option("checkpointLocation", "checkpoints")
+                .start())
 
-    query.awaitTermination()
+    spark.streams.awaitAnyTermination()
