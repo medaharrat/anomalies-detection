@@ -141,7 +141,7 @@ class InfluxDBWriter:
         # Detect anomalies
         preds = None
         if approach == 'lof':
-            preds = model.fit_predict(self._preprocess(row))
+            preds = model.fit_predict(self._preprocess(row).reshape(-1, 1))
         else:
             preds = model.predict(self._preprocess(row))
         return preds
