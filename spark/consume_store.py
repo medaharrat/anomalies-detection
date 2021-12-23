@@ -43,6 +43,7 @@ if __name__=="__main__":
         .load()
 
     inputStream = inputStream.select(col("value").cast("string").alias("data"))
+    # inputStream.withWatermark("Time", "1 minute")
     inputStream.printSchema()
 
     # Delete previous row | debug |
