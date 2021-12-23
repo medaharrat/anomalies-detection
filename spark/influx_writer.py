@@ -93,7 +93,7 @@ class InfluxDBWriter:
                         point.field(key, float(val))
                         row_list.append(float(val))
                 # Predict
-                if self._is_anomaly(row, approach)[0] == -1:
+                if self._is_anomaly(row, approach)[0] == -1 or approach == 'kmeans' and self._is_anomaly(row, approach)[0] == 1:
                     anomaly = np.max(row_list)
                 point.field('anomaly', anomaly)
                 # Add timestamp
