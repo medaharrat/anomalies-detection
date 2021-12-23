@@ -25,7 +25,7 @@ db = DBSCAN(min_samples = min_samples[scores.index(max(scores))], eps = epsilons
 
 # Save model
 try:
-  with open('./dbscan.pickle', 'wb') as f:
+  with open('./models/dbscan.pickle', 'wb') as f:
     pickle.dump(db, f)
 except Exception as ex:
   print(f'> {str(ex)}')
