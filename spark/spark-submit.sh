@@ -1,1 +1,1 @@
-/usr/local/spark/bin/spark-submit --conf "-Dvm.logging.level=WARNING" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0 consume_store.py ocsvm iso_log kmeans
+/usr/local/spark/bin/spark-submit --conf "-Dvm.logging.level=WARNING" --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.0 consume_store.py ocsvm iso_log kmeans dbscan
