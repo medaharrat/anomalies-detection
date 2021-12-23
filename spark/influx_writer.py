@@ -132,12 +132,18 @@ class InfluxDBWriter:
             model = "kmeans.pickle"
         elif approach == 'dbscan':
             model = "dbscan.pickle"
+        elif approach == 'lof':
+            model = "lof.pickle"
         else:
             print(f"[x] {approach} doesn't exist!")
 
         model = pickle.load(open(f'./models/{model}', 'rb'))
         # Detect anomalies
-        preds = model.predict(self._preprocess(row))
+        preds = None
+        if approach == 'lof':
+            preds = model.fit_predict(self._preprocess(row))
+        else:
+            preds = model.predict(self._preprocess(row))
         return preds
 
         
