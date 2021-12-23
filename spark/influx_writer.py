@@ -54,7 +54,6 @@ class InfluxDBWriter:
 
         categ = dataframe[cat]
         continuous = dataframe[cont]
-
         # PCA and StandardScaler Fitted on train data
         pca = pickle.load(open('./transformers/pca.pickle', 'rb'))
         sc = pickle.load(open('./transformers/scaler.pickle', 'rb'))
@@ -66,7 +65,7 @@ class InfluxDBWriter:
         # Merge
         for col in cat:
           processed[col] = dataframe[col]
-        return processed
+        return np.asarray(processed)
     
     def process(self, row):
         try:
@@ -81,6 +80,7 @@ class InfluxDBWriter:
         points = []
         # String to timestamp
         timestamp = datetime.strptime(row_dict["Time"], "%d/%m/%Y %H:%M:%S.%f %p")
+        print(f"> Processing {timestamp}")
         # Handle multiple approaches
         if len(self.approaches) > 1:
             for approach in self.approaches:
@@ -93,9 +93,10 @@ class InfluxDBWriter:
                         point.field(key, float(val))
                         row_list.append(float(val))
                 # Predict
-                if self._is_anomaly(row, approach)[0] == -1 or approach == 'kmeans' and self._is_anomaly(row, approach)[0] == 1:
-                    anomaly = np.max(row_list)
-                point.field('anomaly', anomaly)
+                if self._is_anomaly(row, approach)[0] == -1 or (approach == 'kmeans' and self._is_anomaly(row, approach)[0] == 1):
+                    point.field('anomaly', np.mean(row_list))
+                else:
+                    point.field('anomaly', 0.0)
                 # Add timestamp
                 point.time(timestamp)
                 # Append to a list
@@ -112,10 +113,10 @@ class InfluxDBWriter:
                     point.field(key, float(val))
                     row_list.append(float(val))
             # Predict
-            if self._is_anomaly(row, approach)[0] == -1:
-                anomaly = np.max(row_list)
-            # print(anomaly)
-            point.field('anomaly', anomaly)
+            if self._is_anomaly(row, approach)[0] == -1 or (approach == 'kmeans' and self._is_anomaly(row, approach)[0] == 1):
+                point.field('anomaly', np.mean(row_list))
+            else:
+                point.field('anomaly', 0.0)
             # Add timestamp
             point.time(timestamp)
         return point
@@ -138,3 +139,5 @@ class InfluxDBWriter:
         # Detect anomalies
         preds = model.predict(self._preprocess(row))
         return preds
+
+        

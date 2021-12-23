@@ -18,7 +18,7 @@ data = pd.read_csv('./data/SWaT_train.csv', delimiter=',')
 
 # Fit
 X = data.iloc[:, data.columns != 'Time']
-kmeans = KMeans(n_clusters = 2).fit(X)
+kmeans = KMeans(n_clusters = 2).fit(np.asarray(X))
 
 # Save model: It is important to use binary access
 with open('./models/kmeans.pickle', 'wb') as f:

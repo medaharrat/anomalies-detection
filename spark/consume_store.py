@@ -45,12 +45,13 @@ if __name__=="__main__":
     inputStream = inputStream.select(col("value").cast("string").alias("data"))
     inputStream.printSchema()
 
-    # Delete previous row
-    client = InfluxDBClient(url="http://influxdb:8086", token="iJHZR-dq4I5LIpFZCc5bTUHx-I7dyz29ZTO-B4W5DpU4mhPVDFg-aAb2jK4Vz1C6n0DDb6ddA-bJ3EZAanAOUw==", org="primary")
-    delete_api = client.delete_api()
-    start = "2010-01-01T00:00:00Z"
-    measurement = "data"
-    delete_api.delete(start, datetime.now(), f'_measurement="{measurement}"', bucket="swat", org="primary")
+    # Delete previous row | debug |
+    for m in ['ocsvm', 'kmeans', 'iso_log', 'dbcan']:
+        client = InfluxDBClient(url="http://influxdb:8086", token="iJHZR-dq4I5LIpFZCc5bTUHx-I7dyz29ZTO-B4W5DpU4mhPVDFg-aAb2jK4Vz1C6n0DDb6ddA-bJ3EZAanAOUw==", org="primary")
+        delete_api = client.delete_api()
+        start = "2010-01-01T00:00:00Z"
+        measurement = m
+        delete_api.delete(start, datetime.now(), f'_measurement="{measurement}"', bucket="swat", org="primary")
     print("> Deleted")
 
     # Read stream and process

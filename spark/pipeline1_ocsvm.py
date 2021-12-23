@@ -18,7 +18,7 @@ data = pd.read_csv('./data/SWaT_train.csv', delimiter=',')
 
 # Fit
 X = data.iloc[:, data.columns != 'Time']
-ocsvm = OneClassSVM(gamma='auto').fit(X)
+ocsvm = OneClassSVM(gamma='auto').fit(np.asarray(X))
 
 # Save model: It is important to use binary access
 with open('./models/ocsvm.pickle', 'wb') as f:
