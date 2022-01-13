@@ -12,6 +12,7 @@ RUN python3 pipeline1_ocsvm.py
 RUN python3 pipeline2_iso_log.py 
 RUN python3 pipeline3_kmeans.py 
 RUN python3 pipeline4_dbscan.py 
+RUN python3 pipeline5_lof.py 
 
 RUN echo '[...] Deploy Spark'
 ENTRYPOINT ["sh", "./spark-submit.sh"]

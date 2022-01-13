@@ -13,7 +13,7 @@ import pickle
 # %matplotlib inline
 
 # Importing the dataset
-data = pd.read_csv('./SWaT_train.csv', delimiter=',')
+data = pd.read_csv('./data/SWaT_train.csv', delimiter=',')
 
 # Fit
 X = data.iloc[:, data.columns != 'Time']
