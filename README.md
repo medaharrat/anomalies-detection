@@ -12,8 +12,6 @@ Each batch is pre-processed and stored in InfluxDB as a data point together with
 Data is visualized in Grafana in 4 different boards representing anomalies detected using four different approaches.
 In addition to that, a monitoring board is put in place using Telegraf to collect metrics and visualize in Chronograf.
 <br/>
-![architecture](https://github.com/medaharrat/anomalies-detection/blob/main/docs/Architecture.png)
-
 Each part of the project is containerized using Docker, in addition to two built images
 
 ## Technologies
